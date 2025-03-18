@@ -22,4 +22,5 @@ class MainActivity : AppCompatActivity() {
                 .findFragmentById(R.id.fragmentContainerView) as DieFragment).throwDie()
         }
     }
+
 }
