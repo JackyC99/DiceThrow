@@ -12,7 +12,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
+        if (supportFragmentManager.findFragmentById(R.id.fragmentContainerView) == null)
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainerView, DieFragment())
+                .commit()
 
         findViewById<Button>(R.id.rollDiceButton).setOnClickListener {
             (supportFragmentManager
