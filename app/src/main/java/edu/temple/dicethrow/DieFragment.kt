@@ -11,21 +11,26 @@ import kotlin.random.Random
 class DieFragment : Fragment() {
 
     val DIESIDE = "sidenumber"
-
     val PREV = "previousroll"
-
-    var Current = 0
-
+    var current = 0
     lateinit var dieTextView: TextView
-
     var dieSides: Int = 6
+
+    // Factory method to create an instance of DieFragment with a specific number of sides
+    companion object {
+        fun newInstance(dieSides: Int): DieFragment {
+            val fragment = DieFragment()
+            val args = Bundle()
+            args.putInt(fragment.DIESIDE, dieSides)  // Use the constant DIESIDE correctly
+            fragment.arguments = args
+            return fragment
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            it.getInt(DIESIDE).run {
-                dieSides = this
-            }
+            dieSides = it.getInt(DIESIDE, 6)  // Default to 6 if not provided
         }
     }
 
@@ -33,31 +38,30 @@ class DieFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_die, container, false).apply {
-            dieTextView = findViewById(R.id.dieTextView)
-        }
+        val view = inflater.inflate(R.layout.fragment_die, container, false)
+        dieTextView = view.findViewById(R.id.dieTextView)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         throwDie()
-        savedInstanceState?.getInt(PREV)?.run {
-            Current = this
-            dieTextView.text = Current.toString()
+        savedInstanceState?.getInt(PREV)?.let {
+            current = it
+            dieTextView.text = current.toString()
         }
-        view.setOnClickListener{
+        view.setOnClickListener {
             throwDie()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt(PREV,Current )
+        outState.putInt(PREV, current)
     }
 
     fun throwDie() {
-        Current = Random.nextInt(dieSides) + 1
-        dieTextView.text = Current.toString()
+        current = Random.nextInt(dieSides) + 1
+        dieTextView.text = current.toString()
     }
 }
