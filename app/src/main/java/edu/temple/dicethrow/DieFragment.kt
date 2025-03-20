@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import kotlin.random.Random
 
 class DieFragment : Fragment() {
+
 
     val DIESIDE = "sidenumber"
 
@@ -20,6 +22,8 @@ class DieFragment : Fragment() {
 
     var dieSides: Int = 6
 
+    lateinit var ViewModel: ViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -27,37 +31,34 @@ class DieFragment : Fragment() {
                 dieSides = this
             }
         }
+
+        ViewModel = ViewModelProvider(this)[ViewModel::class.java]
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_die, container, false).apply {
             dieTextView = findViewById(R.id.dieTextView)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        throwDie()
-        savedInstanceState?.getInt(PREV)?.run {
-            Current = this
-            dieTextView.text = Current.toString()
+
+        ViewModel.getCurrentRoll().observe(viewLifecycleOwner) {
+            dieTextView.text = it.toString()
         }
-        view.setOnClickListener{
+
+        if (ViewModel.getCurrentRoll().value == null) {
             throwDie()
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(PREV,Current )
+        fun throwDie() {
+            ViewModel.setCurrentRoll(Random.nextInt(dieSides) + 1)
+        }
     }
 
-    fun throwDie() {
-        Current = Random.nextInt(dieSides) + 1
-        dieTextView.text = Current.toString()
-    }
-}
+
